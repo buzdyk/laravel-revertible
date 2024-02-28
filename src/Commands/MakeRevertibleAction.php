@@ -1,6 +1,6 @@
 <?php
 
-namespace Buzdyk\Revertible;
+namespace Buzdyk\Revertible\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 

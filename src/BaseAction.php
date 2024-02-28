@@ -3,14 +3,15 @@
 namespace Buzdyk\Revertible;
 
 use Buzdyk\Revertible\Contracts\RevertibleAction;
+use Buzdyk\Revertible\Contracts\RevertibleUpdate;
 use Buzdyk\Revertible\Models\Revertible;
 
 abstract class BaseAction implements RevertibleAction
 {
-    abstract public function execute(): mixed;
-    abstract public function revert(): mixed;
+    abstract public function execute(): RevertibleUpdate;
+    abstract public function revert(Revertible $revertible): void;
 
-    public function onExecute(Revertible $revertible, mixed $executeReturn = null): Revertible
+    public function onExecute(Revertible $revertible, RevertibleUpdate $update): void
     {
         // persist action constructor parameters in $revertible->parameters
         $params = (new \ReflectionClass(static::class))
@@ -21,20 +22,18 @@ abstract class BaseAction implements RevertibleAction
             $revertible->addParameter($param->name, $this->{$param->name});
         }
 
-        return $revertible;
+        $revertible->initial_value = $update->getInitialValue();
+        $revertible->result_value = $update->getResultValue();
     }
 
-    public function onRevert(Revertible $revertible, mixed $revertReturn = null): Revertible
-    {
-        return $revertible;
-    }
+    public function onRevert(Revertible $revertible): void {}
 
     public function shouldExecute(): bool
     {
         return true;
     }
 
-    public function shouldRevert(): bool
+    public function shouldRevert(Revertible $revertible): bool
     {
         return true;
     }

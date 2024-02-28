@@ -19,7 +19,37 @@
     "require": {
         "illuminate/database": "^10.0",
         "illuminate/support": "^10.0",
-
         "ext-json": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.21",
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Buzdyk\\Revertible\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Buzdyk\\Revertible\\Testing\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve"
+        ],
+        "lint": [
+            "@php vendor/bin/phpstan analyse"
+        ]
     }
 }

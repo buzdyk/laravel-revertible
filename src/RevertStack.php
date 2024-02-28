@@ -35,7 +35,7 @@ class RevertStack
      */
     public function revert(): Collection
     {
-        /** @var FacadeAccessor $revertible */
+        /** @var Revertible $revertible */
         foreach ($this->revertibles as $revertible) {
             $class = $revertible->action_class;
             $parameters = $revertible->expandParameters();
@@ -49,9 +49,13 @@ class RevertStack
 
             /** @var RevertibleAction $action */
             $action = new $class(...$constructorParams);
-            $exec = $action->revert();
 
-            $action->onRevert($revertible, $exec);
+            if ($action->shouldRevert($revertible) === false) {
+                continue;
+            }
+
+            $action->revert($revertible);
+            $action->onRevert($revertible);
 
             $revertible->reverted = true;
             $revertible->save();

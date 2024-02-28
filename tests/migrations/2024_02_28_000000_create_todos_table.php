@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('laravel_revertibles', function(Blueprint $table) {
+        Schema::create('todos', function(Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('group_uuid');
+            $table->string('status');
 
             $table->string('action_class');
             $table->json('parameters', 255);
