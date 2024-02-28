@@ -1,0 +1,46 @@
+<?php
+
+namespace {{ namespace }}
+
+use Buzdyk\Revertible\BaseAction;
+use Buzdyk\Revertible\Contracts\RevertibleAction;
+use Buzdyk\Revertible\Models\Revertible;
+
+class {{ ActionName }} extends BaseAction implements RevertibleAction
+{
+    public function __construct(
+        /** protected \App\Models\User $user */
+    ) {}
+
+    public function execute(Revertible $revertible): Revertible
+    {
+        return $revertible;
+    }
+
+    public function revert(Revertible $revertible): Revertible
+    {
+        return $revertible;
+    }
+
+    public function onExecute(Revertible $revertible, mixes $executeReturn): Revertible
+    {
+        parent::onExecute($revertible, $executeReturn);
+
+        return $revertible;
+    }
+
+    public function onRevert(Revertible $revertible, mixed $revertReturn): Revertible
+    {
+        return $revertible;
+    }
+
+    public function shouldExecute(): bool
+    {
+        return true;
+    }
+
+    public function shouldRevert(): bool
+    {
+        return true;
+    }
+}

@@ -1,24 +1,25 @@
 {
     "name": "buzdyk/laravel-revertible",
-    "description": "An abstraction to run and undo a set of actions",
+    "description": "",
     "keywords": [
         "laravel",
         "undo",
-        "revert",
-        "actions"
+        "revert"
     ],
-
     "extra": {
-        "providers": [
-            "Buzdyk\\Revertible\\ServiceProvider"
-        ]
+        "laravel": {
+            "providers": [
+                "Buzdyk\\Revertible\\ServiceProvider"
+            ],
+            "aliases": {
+                "Revertible": "Buzdyk\\Revertible\\Facade"
+            }
+        }
     },
-
     "require": {
-        "ext-json": "*"
-    },
+        "illuminate/database": "^10.0",
+        "illuminate/support": "^10.0",
 
-    "require-dev": {
-        "laravel/framework": "^10.46"
+        "ext-json": "*"
     }
 }
