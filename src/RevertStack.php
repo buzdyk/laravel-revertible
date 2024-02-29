@@ -17,9 +17,9 @@ class RevertStack
 
     /**
      * @param $groupUuid
-     * @return self
+     * @return static
      */
-    public static function make($groupUuid): self
+    public static function make($groupUuid): static
     {
         $query = Revertible::query()
             ->where('group_uuid', $groupUuid)

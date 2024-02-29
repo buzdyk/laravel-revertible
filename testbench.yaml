@@ -1,0 +1,20 @@
+providers:
+  # - Workbench\App\Providers\WorkbenchServiceProvider
+
+migrations:
+  - /database/migrations
+
+seeders:
+
+workbench:
+  start: '/src'
+  install: true
+  discovers:
+    web: false
+    api: false
+    commands: false
+    components: false
+    views: false
+  build: []
+  assets: []
+  sync: []
