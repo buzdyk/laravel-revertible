@@ -8,12 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RevertStack
 {
-    /**
-     * @param Collection $revertibles
-     */
-    protected function __construct(
-        protected Collection $revertibles
-    ) {}
+    protected Collection $revertibles;
 
     /**
      * @param $groupUuid
@@ -37,18 +32,7 @@ class RevertStack
     {
         /** @var Revertible $revertible */
         foreach ($this->revertibles as $revertible) {
-            $class = $revertible->action_class;
-            $parameters = $revertible->expandParameters();
-
-            $constructorParams = array_map(
-                fn ($param) => $parameters[$param->name],
-                (new \ReflectionClass($class))
-                    ->getConstructor()
-                    ->getParameters()
-            );
-
-            /** @var RevertibleAction $action */
-            $action = new $class(...$constructorParams);
+            $action = $revertible->restoreAction();
 
             if ($action->shouldRevert($revertible) === false) {
                 continue;

@@ -2,6 +2,7 @@
 
 namespace Buzdyk\Revertible\Models;
 
+use Buzdyk\Revertible\Contracts\RevertibleAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -15,14 +16,24 @@ class Revertible extends Model
 
     protected $guarded = [];
 
-    public function revert(): self
+    public function restoreAction(): RevertibleAction|null
     {
-        $params = $this->getParameters();
+        if (! $this->executed) {
+            return null;
+        }
+
         $class = $this->action_class;
+        $parameters = $this->expandParameters();
 
-        $action = new $class(...$params);
+        $constructorParams = array_map(
+            fn ($param) => $parameters[$param->name],
+            (new \ReflectionClass($class))
+                ->getConstructor()
+                ->getParameters()
+        );
 
-        return $action->revert($this);
+        /** @var RevertibleAction $action */
+        return new $class(...$constructorParams);
     }
 
     public function getParametersAttribute($value): array

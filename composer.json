@@ -1,6 +1,6 @@
 {
     "name": "buzdyk/laravel-revertible",
-    "description": "",
+    "description": "An abstraction to run and revert a pre-defined set of actions",
     "keywords": [
         "laravel",
         "undo",

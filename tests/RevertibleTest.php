@@ -4,18 +4,17 @@ namespace Buzdyk\Revertible\Testing;
 
 use Buzdyk\Revertible\ActionStack;
 use Buzdyk\Revertible\Testing\Actions\Todo\Reassign;
-use Buzdyk\Revertible\Testing\Models\Todo;
 use Buzdyk\Revertible\Models\Revertible;
 
-class ActionStackTest extends TestCase
+class RevertibleTest extends TestCase
 {
 
-    public function it_executes_all_actions_added_to_the_stack()
+    public function it_executes_actions_added_to_the_stack()
     {
 
     }
 
-    public function it_assigns_uuid_to_executed_actions()
+    public function it_assigns_same_uuid_to_executed_actions()
     {
 
     }
@@ -40,12 +39,18 @@ class ActionStackTest extends TestCase
         $this->assertEquals(10, $rawParams['assigneeId']);
     }
 
+    /**
+     * @test
+     */
     public function it_persists_action_class_on_execute()
     {
 
     }
 
-    public function it_skips_actions_that_shouldnt_execute()
+    /**
+     * @test
+     */
+    public function it_skips_actions_when_applicable()
     {
 
     }
