@@ -4,7 +4,7 @@ namespace Buzdyk\Revertible\Testing\Actions\Todo;
 
 use Buzdyk\Revertible\BaseAction;
 use Buzdyk\Revertible\Contracts\RevertibleUpdate;
-use Buzdyk\Revertible\ExecuteUpdate;
+use Buzdyk\Revertible\ActionUpdate;
 use Buzdyk\Revertible\Models\Revertible;
 use Buzdyk\Revertible\Testing\Models\Todo;
 
@@ -18,7 +18,7 @@ class Reassign extends BaseAction
     public function execute(): RevertibleUpdate
     {
         return tap(
-            new ExecuteUpdate($this->todo->assignee_id, $this->assigneeId),
+            new ActionUpdate($this->todo->assignee_id, $this->assigneeId),
             fn (RevertibleUpdate $u) => $this->todo->update(['assignee_id' => $u->getResultValue()])
         );
     }

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('group_uuid');
 
             $table->string('action_class');
-            $table->json('parameters', 255);
+            $table->json('constructor_params')->nullable()->default(null);
 
             $table->string('initial_value')->nullable()->default(null);
             $table->string('result_value')->nullable()->default(null);

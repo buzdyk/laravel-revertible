@@ -14,8 +14,8 @@ class ActionStack
     public function __construct(
         protected Collection $actions = new Collection(),
     ) {
-        // todo custom uuid generator
-        $this->uuid = Str::random();
+        // todo allow a custom uuid generator, guarantee uniqueness
+        $this->uuid = Str::random(20);
     }
 
     public static function make(): static
@@ -40,8 +40,12 @@ class ActionStack
                 'group_uuid' => $this->uuid,
                 'action_class' => static::class,
             ]);
+            $revertible->setConstructorParams($action);
 
-            $action->onExecute($revertible, $action->execute());
+            $action->onExecute(
+                $revertible,
+                $action->execute()
+            );
 
             $revertible->executed = true;
             $revertible->save();

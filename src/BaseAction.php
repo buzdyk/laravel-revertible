@@ -13,15 +13,6 @@ abstract class BaseAction implements RevertibleAction
 
     public function onExecute(Revertible $revertible, RevertibleUpdate $update): void
     {
-        // persist action constructor parameters in $revertible->parameters
-        $params = (new \ReflectionClass(static::class))
-            ->getConstructor()
-            ->getParameters();
-
-        foreach ($params as $param) {
-            $revertible->addParameter($param->name, $this->{$param->name});
-        }
-
         $revertible->initial_value = $update->getInitialValue();
         $revertible->result_value = $update->getResultValue();
     }

@@ -4,7 +4,7 @@ namespace Buzdyk\Revertible\Testing\Actions\Todo;
 
 use Buzdyk\Revertible\BaseAction;
 use Buzdyk\Revertible\Contracts\RevertibleUpdate;
-use Buzdyk\Revertible\ExecuteUpdate;
+use Buzdyk\Revertible\ActionUpdate;
 use Buzdyk\Revertible\Models\Revertible;
 use Buzdyk\Revertible\Testing\Models\Todo;
 
@@ -18,7 +18,7 @@ class ChangeStatus extends BaseAction
     public function execute(): RevertibleUpdate
     {
         return tap(
-            new ExecuteUpdate($this->todo->status, $this->status),
+            new ActionUpdate($this->todo->status, $this->status),
             fn (RevertibleUpdate $u) => $this->todo->update(['status' => $u->getResultValue()])
         );
     }

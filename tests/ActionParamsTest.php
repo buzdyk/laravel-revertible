@@ -6,7 +6,7 @@ use Buzdyk\Revertible\ActionStack;
 use Buzdyk\Revertible\BaseAction;
 use Buzdyk\Revertible\Contracts\RevertibleAction;
 use Buzdyk\Revertible\Contracts\RevertibleUpdate;
-use Buzdyk\Revertible\ExecuteUpdate;
+use Buzdyk\Revertible\ActionUpdate;
 use Buzdyk\Revertible\Models\Revertible;
 use Buzdyk\Revertible\RevertStack;
 use Buzdyk\Revertible\Testing\Actions\Todo\Reassign;

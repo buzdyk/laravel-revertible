@@ -41,22 +41,34 @@ class Revertible extends Model
         return $value ? json_decode($value, true) : [];
     }
 
-    public function addParameter($key, mixed $value): Revertible
+    public function setConstructorParams(RevertibleAction $action)
     {
-        if ($value instanceof Model) {
-            $value = "__eloquent__model:" . get_class($value) . ":$value->id";
+        $constructorParams = [];
+
+        // persist action constructor parameters in $revertible->parameters
+        $params = (new \ReflectionClass($action::class))
+            ->getConstructor()
+            ->getParameters();
+
+        foreach ($params as $param) {
+            $prop = new \ReflectionProperty($action::class, $param->name);
+            $value = $prop->getValue($action);
+
+            $constructorParams[$param->name] = $value instanceof Model
+                ? "__eloquent__model:" . get_class($value) . ":" . $value->getKey()
+                : $value;
         }
 
-        $this->params[$key] = $value;
-
-        return $this;
+        $this->constructor_params = $constructorParams;
     }
 
-    public function expandParameters(): Collection
+    public function getConstructorParams(): Collection
     {
-        $parameters = $this->parameters;
+        if (! ($params = $this->constructor_params)) {
+            return collect();
+        }
 
-        foreach ($parameters as $name => $value) {
+        foreach ($params as $name => $value) {
             $eloquentPrefix = "__eloquent__model:";
 
             if (is_string($value) && str_starts_with($eloquentPrefix, $value)) {
@@ -68,6 +80,6 @@ class Revertible extends Model
             }
         }
 
-        return collect($parameters);
+        return collect($params);
     }
 }
