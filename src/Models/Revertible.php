@@ -3,8 +3,10 @@
 namespace Buzdyk\Revertible\Models;
 
 use Buzdyk\Revertible\Contracts\RevertibleAction;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 
 class Revertible extends Model
@@ -84,5 +86,15 @@ class Revertible extends Model
         }
 
         return collect($params);
+    }
+
+    public function scopeReverted(Builder $query): void
+    {
+        $query->where('reverted', true);
+    }
+
+    public function scopeExecuted(Builder $query): void
+    {
+        $query->where('executed', true);
     }
 }

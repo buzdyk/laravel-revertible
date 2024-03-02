@@ -61,11 +61,15 @@ class RevertStack
 
             DB::commit();
 
-            return $this->revertibles->fresh();
+            return $this->revertibles;
         } catch (\Exception $e) {
             $this->runInTransaction && DB::rollback();
+            $this->revertibles = $this->revertibles->fresh();
+
             throw $e;
         }
+
+
     }
 
     public function collection()

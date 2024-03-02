@@ -25,7 +25,9 @@ class ChangeStatus extends BaseAction
 
     public function revert(Revertible $revertible): void
     {
-        $this->todo->update(['assignee_id' => $revertible->initial_value]);
+        $this->todo->update([
+            'status' => $revertible->initial_value
+        ]);
     }
 
     public function shouldExecute(): bool
