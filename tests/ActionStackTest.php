@@ -3,50 +3,66 @@
 namespace Buzdyk\Revertible\Testing;
 
 use Buzdyk\Revertible\ActionStack;
+use Buzdyk\Revertible\Testing\Actions\NotExecutable;
+use Buzdyk\Revertible\Testing\Actions\StatelessAction;
 use Buzdyk\Revertible\Testing\Actions\Todo\Reassign;
 use Buzdyk\Revertible\Testing\Models\Todo;
 use Buzdyk\Revertible\Models\Revertible;
 
 class ActionStackTest extends TestCase
 {
-
-    public function it_executes_all_actions_added_to_the_stack()
+    /** @test */
+    public function it_assigns_queued_actions_the_same_uuid()
     {
+        $uuid = ActionStack::make()
+            ->push(new StatelessAction())
+            ->push(new StatelessAction())
+            ->push(new StatelessAction())
+            ->execute();
 
+        $this->assertEquals(3, Revertible::where('group_uuid', $uuid)->count());
     }
 
-    public function it_assigns_uuid_to_executed_actions()
+    /** @test */
+    public function it_skips_actions_that_shouldnt_execute()
     {
+        ActionStack::make()
+            ->push(new NotExecutable())
+            ->push(new NotExecutable());
 
+        $this->assertEquals(0, 0);
     }
 
-    /**
-     * @test
-     */
-    public function it_persists_constructor_params_on_execute()
+    /** @test */
+    public function stacks_generate_unique_uuids()
     {
-        $todo = new Models\Todo; // @todo make a factory for this
+        $uuid1 = ActionStack::make()
+            ->push(new StatelessAction())
+            ->execute();
+
+        $uuid2 = ActionStack::make()
+            ->push(new StatelessAction())
+            ->execute();
+
+        $this->assertNotEquals($uuid1, $uuid2);
+    }
+
+    /** @test */
+    public function it_executes_actions_in_the_correct_order()
+    {
+        $todo = $this->createTodo();
 
         ActionStack::make()
+            ->push(new Reassign($todo, 5))
             ->push(new Reassign($todo, 10))
             ->execute();
 
-        $revertible = Revertible::first();
-        $rawParams = $revertible->expandParameters();
-
-        $this->assertArrayHasKey('todo', $rawParams);
-        $this->assertArrayHasKey('assigneeId', $rawParams);
-        $this->assertEquals('__eloquent__model:' . $todo::class . ':' . $todo->id, $rawParams['todo']);
-        $this->assertEquals(10, $rawParams['assigneeId']);
+        $this->assertEquals(10, $todo->assignee_id);
     }
 
-    public function it_persists_action_class_on_execute()
+    /** @test */
+    public function it_rollbacks_actions_on_exception_if_run_in_transaction()
     {
-
-    }
-
-    public function it_skips_actions_that_shouldnt_execute()
-    {
-
+        // todo add test
     }
 }

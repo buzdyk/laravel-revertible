@@ -6,21 +6,25 @@ use Buzdyk\Revertible\Contracts\RevertibleAction;
 use Buzdyk\Revertible\Models\Revertible;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use DB;
 
 class ActionStack
 {
     protected string $uuid;
+    protected Collection $actions;
 
-    public function __construct(
-        protected Collection $actions = new Collection(),
+    protected function __construct(
+        protected bool $runInTransaction = false
     ) {
-        // todo allow a custom uuid generator, guarantee uniqueness
-        $this->uuid = Str::random(20);
+        // todo? allow a custom uuid generator
+        // todo guarantee uniqueness for unlikely collisions
+        $this->uuid = Str::random(60);
+        $this->actions = new Collection();
     }
 
-    public static function make(): static
+    public static function make($runInTransaction = false): static
     {
-        return new static;
+        return new static($runInTransaction);
     }
 
     public function push(RevertibleAction $action): self
@@ -28,29 +32,41 @@ class ActionStack
         return tap($this, fn () => $this->actions->push($action));
     }
 
-    public function execute(): RevertStack
+    /**
+     * @throws \Exception
+     */
+    public function execute(): string
     {
-        /** @var RevertibleAction $action */
-        while ($action = $this->actions->shift()) {
-            if ($action->shouldExecute() !== true) {
-                continue;
+        try {
+            $this->runInTransaction && DB::beginTransaction();
+
+            /** @var RevertibleAction $action */
+            while ($action = $this->actions->shift()) {
+                if ($action->shouldExecute() !== true) {
+                    continue;
+                }
+
+                $revertible = new Revertible([
+                    'group_uuid' => $this->uuid,
+                ]);
+                $revertible->setActionContext($action);
+
+                $action->onExecute(
+                    $revertible,
+                    $action->execute()
+                );
+
+                $revertible->executed = true;
+                $revertible->save();
             }
 
-            $revertible = new Revertible([
-                'group_uuid' => $this->uuid,
-            ]);
-            $revertible->setActionContext($action);
-
-            $action->onExecute(
-                $revertible,
-                $action->execute()
-            );
-
-            $revertible->executed = true;
-            $revertible->save();
+            $this->runInTransaction && DB::commit();
+        } catch (\Exception $e) {
+            $this->runInTransaction && DB::rollback();
+            throw $e;
         }
 
-        return RevertStack::make($this->uuid);
+        return $this->uuid;
     }
 
     public function collection(): Collection

@@ -4,10 +4,13 @@ namespace Buzdyk\Revertible\Models;
 
 use Buzdyk\Revertible\Contracts\RevertibleAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 class Revertible extends Model
 {
+    use SoftDeletes;
+
     public $table = 'laravel_revertibles';
 
     protected $casts = [
