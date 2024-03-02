@@ -11,19 +11,17 @@ class Revertible extends Model
     public $table = 'laravel_revertibles';
 
     protected $casts = [
-        'parameters' => 'array'
+        'constructor_params' => 'array'
     ];
 
-    protected $guarded = [];
+    protected $fillable = [
+        'group_uuid',
+    ];
 
     public function restoreAction(): RevertibleAction|null
     {
-        if (! $this->executed) {
-            return null;
-        }
-
         $class = $this->action_class;
-        $parameters = $this->expandParameters();
+        $parameters = $this->getConstructorParams();
 
         $constructorParams = array_map(
             fn ($param) => $parameters[$param->name],
@@ -36,12 +34,7 @@ class Revertible extends Model
         return new $class(...$constructorParams);
     }
 
-    public function getParametersAttribute($value): array
-    {
-        return $value ? json_decode($value, true) : [];
-    }
-
-    public function setConstructorParams(RevertibleAction $action)
+    public function setActionContext(RevertibleAction $action): static
     {
         $constructorParams = [];
 
@@ -59,10 +52,13 @@ class Revertible extends Model
                 : $value;
         }
 
+        $this->action_class = $action::class;
         $this->constructor_params = $constructorParams;
+
+        return $this;
     }
 
-    public function getConstructorParams(): Collection
+    protected function getConstructorParams(): Collection
     {
         if (! ($params = $this->constructor_params)) {
             return collect();
@@ -71,11 +67,15 @@ class Revertible extends Model
         foreach ($params as $name => $value) {
             $eloquentPrefix = "__eloquent__model:";
 
-            if (is_string($value) && str_starts_with($eloquentPrefix, $value)) {
+            if (is_string($value) && str_starts_with($value, $eloquentPrefix)) {
                 list ($class, $id) = explode(":", str_replace($eloquentPrefix, "", $value));
 
                 if (class_exists($class)) {
-                    $params[$name] = $class::withTrashed()->find($id);
+                    $query = in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses(new $class))
+                        ? $class::withTrashed()
+                        : $class::query();
+
+                    $params[$name] = $query->find($id);
                 }
             }
         }

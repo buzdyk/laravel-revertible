@@ -10,16 +10,9 @@ return new class extends Migration
     {
         Schema::create('todos', function(Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('title');
             $table->string('status');
-
-            $table->string('action_class');
-            $table->json('parameters', 255);
-
-            $table->string('initial_value')->nullable()->default(null);
-            $table->string('result_value')->nullable()->default(null);
-
-            $table->boolean('executed')->default(false);
-            $table->boolean('reverted')->default(false);
+            $table->unsignedInteger('assignee_id');
 
             $table->timestamps();
             $table->softDeletes();

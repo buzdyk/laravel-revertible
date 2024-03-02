@@ -38,9 +38,8 @@ class ActionStack
 
             $revertible = new Revertible([
                 'group_uuid' => $this->uuid,
-                'action_class' => static::class,
             ]);
-            $revertible->setConstructorParams($action);
+            $revertible->setActionContext($action);
 
             $action->onExecute(
                 $revertible,
