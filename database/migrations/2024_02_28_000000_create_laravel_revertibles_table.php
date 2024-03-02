@@ -14,6 +14,7 @@ return new class extends Migration
 
             $table->string('action_class');
             $table->json('constructor_params')->nullable()->default(null);
+            $table->unsignedInteger('actor_id')->nullable()->default(null); // convenience field
 
             $table->string('initial_value')->nullable()->default(null);
             $table->string('result_value')->nullable()->default(null);
