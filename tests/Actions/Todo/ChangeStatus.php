@@ -3,9 +3,6 @@
 namespace Buzdyk\Revertible\Testing\Actions\Todo;
 
 use Buzdyk\Revertible\BaseAction;
-use Buzdyk\Revertible\Contracts\RevertibleUpdate;
-use Buzdyk\Revertible\ActionUpdate;
-use Buzdyk\Revertible\Models\Revertible;
 use Buzdyk\Revertible\Testing\Models\Todo;
 
 class ChangeStatus extends BaseAction
@@ -15,18 +12,17 @@ class ChangeStatus extends BaseAction
         protected string $status
     ) {}
 
-    public function execute(): RevertibleUpdate
+    public function execute(): void
     {
-        return tap(
-            new ActionUpdate($this->todo->status, $this->status),
-            fn (RevertibleUpdate $u) => $this->todo->update(['status' => $u->getResultValue()])
-        );
+        $this->setValues($this->todo->status, $this->status);
+
+        $this->todo->update(['status' => $this->status]);
     }
 
-    public function revert(Revertible $revertible): void
+    public function revert(): void
     {
         $this->todo->update([
-            'status' => $revertible->initial_value
+            'status' => $this->getInitialValue()
         ]);
     }
 
@@ -35,7 +31,7 @@ class ChangeStatus extends BaseAction
         return $this->todo->status !== $this->status;
     }
 
-    public function shouldRevert(Revertible $revertible): bool
+    public function shouldRevert(): bool
     {
         return $this->todo->status === $this->status;
     }

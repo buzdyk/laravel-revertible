@@ -52,8 +52,9 @@ class RevertStack
                     continue;
                 }
 
-                $action->revert($revertible);
-                $action->onRevert($revertible);
+                $action
+                    ->setRevertible($revertible)
+                    ->revert();
 
                 $revertible->reverted = true;
                 $revertible->save();

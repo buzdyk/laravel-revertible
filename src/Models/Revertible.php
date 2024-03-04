@@ -26,17 +26,14 @@ class Revertible extends Model
     public function restoreAction(): RevertibleAction|null
     {
         $class = $this->action_class;
-        $parameters = $this->getConstructorParams();
+        $constructorParameters = $this->getConstructorParams();
 
-        $constructorParams = array_map(
-            fn ($param) => $parameters[$param->name],
+        return new $class(...array_map(
+            fn ($param) => $constructorParameters[$param->name],
             (new \ReflectionClass($class))
                 ->getConstructor()
                 ->getParameters()
-        );
-
-        /** @var RevertibleAction $action */
-        return new $class(...$constructorParams);
+        ));
     }
 
     public function setActionContext(RevertibleAction $action): static

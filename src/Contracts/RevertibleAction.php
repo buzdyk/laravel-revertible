@@ -4,12 +4,11 @@ namespace Buzdyk\Revertible\Contracts;
 use Buzdyk\Revertible\Models\Revertible;
 
 interface RevertibleAction {
-    public function execute(): RevertibleUpdate;
-    public function revert(Revertible $revertible): void;
+    public function setRevertible(Revertible $revertible): static;
 
-    public function onExecute(Revertible $revertible, RevertibleUpdate $update): void;
-    public function onRevert(Revertible $revertible): void;
+    public function execute(): void;
+    public function revert(): void;
 
     public function shouldExecute(): bool;
-    public function shouldRevert(Revertible $revertible): bool;
+    public function shouldRevert(): bool;
 }

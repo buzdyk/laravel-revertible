@@ -17,8 +17,6 @@ class ActionStack
     protected function __construct(
         protected bool $runInTransaction = false
     ) {
-        // todo? allow a custom uuid generator
-        // todo guarantee uniqueness for unlikely collisions
         $this->uuid = Str::random(60);
         $this->actions = new Collection();
     }
@@ -50,12 +48,12 @@ class ActionStack
                 $revertible = new Revertible([
                     'group_uuid' => $this->uuid,
                 ]);
+
                 $revertible->setActionContext($action);
 
-                $action->onExecute(
-                    $revertible,
-                    $action->execute()
-                );
+                $action
+                    ->setRevertible($revertible)
+                    ->execute($revertible);
 
                 $revertible->executed = true;
                 $revertible->save();

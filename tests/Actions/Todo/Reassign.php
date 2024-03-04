@@ -3,9 +3,6 @@
 namespace Buzdyk\Revertible\Testing\Actions\Todo;
 
 use Buzdyk\Revertible\BaseAction;
-use Buzdyk\Revertible\Contracts\RevertibleUpdate;
-use Buzdyk\Revertible\ActionUpdate;
-use Buzdyk\Revertible\Models\Revertible;
 use Buzdyk\Revertible\Testing\Models\Todo;
 
 class Reassign extends BaseAction
@@ -15,27 +12,26 @@ class Reassign extends BaseAction
         protected int $assigneeId
     ) {}
 
-    public function execute(): RevertibleUpdate
+    public function execute(): void
     {
-        return tap(
-            new ActionUpdate($this->todo->assignee_id, $this->assigneeId),
-            fn (RevertibleUpdate $u) => $this->todo->update(['assignee_id' => $u->getResultValue()])
-        );
+        $this->setValues($this->todo->assignee_id, $this->assigneeId);
+
+        $this->todo->update(['assignee_id' => $this->assigneeId]);
     }
 
-    public function revert(Revertible $revertible): void
+    public function revert(): void
     {
         $this->todo->update([
-            'assignee_id' => $revertible->initial_value
+            'assignee_id' => $this->getInitialValue()
         ]);
     }
 
     public function shouldExecute(): bool
     {
-        return $this->todo->assignee_id !== $this->assigneeId;
+        return $this->todo->assignee_id !== (int) $this->assigneeId;
     }
 
-    public function shouldRevert(Revertible $revertible): bool
+    public function shouldRevert(): bool
     {
         return $this->todo->assignee_id === $this->assigneeId;
     }
