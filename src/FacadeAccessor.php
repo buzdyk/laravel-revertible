@@ -3,17 +3,18 @@
 namespace Buzdyk\Revertible;
 
 use Illuminate\Support\Collection;
+use Buzdyk\Revertible\ActionStack;
 
 class FacadeAccessor {
 
-    public function actionStack(Collection $actions = new Collection()): ActionStack
+    public function actionStack(bool $runInTransaction): ActionStack
     {
-        return new ActionStack();
+        return ActionStack::make($runInTransaction);
     }
 
-    public function revertStack(string $uuid): RevertStack
+    public function revertStack(string $uuid, bool $runInTransaction = false): RevertStack
     {
-        return RevertStack::make($uuid);
+        return RevertStack::make($uuid, $runInTransaction);
     }
 
 }

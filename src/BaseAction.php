@@ -7,7 +7,8 @@ use Buzdyk\Revertible\Models\Revertible;
 
 abstract class BaseAction implements RevertibleAction
 {
-    private Revertible $revertible; // only BaseAction should know details about Revertible implementation
+    // only BaseAction should know details about Revertible implementation
+    private Revertible $revertible;
 
     abstract public function execute(): void;
     abstract public function revert(): void;
@@ -27,7 +28,7 @@ abstract class BaseAction implements RevertibleAction
         return tap($this, fn () => $this->revertible = $revertible);
     }
 
-    protected function setValues(mixed $initialValue, mixed $resultValue): static
+    protected function setValues(mixed $initialValue = null, mixed $resultValue = null): static
     {
         $this->revertible->initial_value = $initialValue;
         $this->revertible->result_value = $resultValue;
@@ -35,22 +36,24 @@ abstract class BaseAction implements RevertibleAction
         return $this;
     }
 
-    protected function setActorId(int $actorId)
-    {
-        $this->revertible->actor_id = $actorId;
-    }
-
-    protected function getInitialValue()
+    protected function getInitialValue(): mixed
     {
         return $this->revertible->initial_value;
     }
 
-    protected function getResultValue()
+    protected function getResultValue(): mixed
     {
         return $this->revertible->result_value;
     }
 
-    protected function getActorId()
+    protected function setActorId(mixed $actorId): static
+    {
+        $this->revertible->actor_id = $actorId;
+
+        return $this;
+    }
+
+    protected function getActorId(): int
     {
         return $this->revertible->actor_id;
     }
